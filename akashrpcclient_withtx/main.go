@@ -31,14 +31,10 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Printf("SDL Manifest: %+v\n", sdlManifest)
-
 	groups, err := sdlManifest.DeploymentGroups()
 	if err != nil {
 		fmt.Println("Error: ", err)
 	}
-
-	fmt.Println("Groups: ", groups)
 
 	id := v1beta2.DeploymentID{}
 
@@ -58,14 +54,10 @@ func main() {
 		fmt.Println("Error: ", err)
 	}
 
-	fmt.Println("ID:  ", id)
-
 	version, err := sdl.Version(sdlManifest)
 	if err != nil {
 		fmt.Println("Error from Version: ", err)
 	}
-
-	fmt.Println("Version: ", string(version))
 
 	deposit := "5000000uakt"
 	depositCoin, err := sdk.ParseCoinNormalized(deposit)
@@ -88,13 +80,9 @@ func main() {
 		msg.Groups = append(msg.Groups, *group)
 	}
 
-	fmt.Println("Msg: ", msg)
-
 	if err := msg.ValidateBasic(); err != nil {
 		fmt.Println("Error from ValidateBasic: ", err)
 	}
-
-	fmt.Println("PAST ValidateBasic check")
 
 	///////TX OPERATIONS/////////
 

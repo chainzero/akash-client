@@ -149,17 +149,11 @@ func New(ctx context.Context, options ...Option) (Client, error) {
 		c.keyringDir = c.homePath
 	}
 
-	fmt.Println("account.WithKeyringBackend(c.keyringBackend): ", account.WithKeyringBackend(c.keyringBackend))
-	fmt.Println("account.WithHome(c.keyringDir) ", account.WithHome(c.keyringDir))
-
 	c.AccountRegistry, err = account.New(
 		account.WithKeyringServiceName(c.keyringServiceName),
 		account.WithKeyringBackend(c.keyringBackend),
 		account.WithHome(c.keyringDir),
 	)
-	fmt.Println("Client after account new")
-	fmt.Printf("%+v", c)
-	fmt.Println("c.AccountRegistry after account new: ", c.AccountRegistry)
 
 	if err != nil {
 		return Client{}, err
@@ -285,13 +279,10 @@ type Response struct {
 }
 
 func (c Client) CreateTx(goCtx context.Context, account account.Account, msgs ...sdktypes.Msg) (TxService, error) {
-	fmt.Println("Within CreateTx")
-	fmt.Println("Account within CreateTx: ", account)
 	defer c.lockBech32Prefix()()
 
 	if !c.generateOnly {
 		addr, err := account.Address(c.addressPrefix)
-		fmt.Println("addr within CreateTX: ", addr)
 		if err != nil {
 			return TxService{}, errors.WithStack(err)
 		}
@@ -302,9 +293,6 @@ func (c Client) CreateTx(goCtx context.Context, account account.Account, msgs ..
 
 	sdkaddr := account.Info.GetAddress()
 
-	fmt.Println("within createtx account.Name: ", account.Name)
-	fmt.Println("within createtx sdkaddr: ", sdkaddr)
-
 	ctx := c.context.
 		WithFromName(account.Name).
 		WithFromAddress(sdkaddr)
@@ -314,48 +302,32 @@ func (c Client) CreateTx(goCtx context.Context, account account.Account, msgs ..
 		return TxService{}, err
 	}
 
-	fmt.Println("past c.prepareFactory(ctx)")
-	fmt.Println("TXF after prepare factory: ", txf)
-
 	var gas uint64
 	if c.gas != "" && c.gas != GasAuto {
-		fmt.Println("within c.gas conditional")
 		gas, err = strconv.ParseUint(c.gas, 10, 64)
 		if err != nil {
-			fmt.Println("Error in ParseUint: ", err)
 			return TxService{}, errors.WithStack(err)
 		}
 	} else {
-		fmt.Println("within c.gas ELSE conditional")
 		_, gas, err = c.gasometer.CalculateGas(ctx, txf, msgs...)
 		if err != nil {
-			fmt.Println("Error in CalculateGas: ", err)
 			return TxService{}, errors.WithStack(err)
 		}
-		fmt.Println("Gas from gasometer: ", gas)
 		// the simulated gas can vary from the actual gas needed for a real transaction
 		// we add an amount to ensure sufficient gas is provided
 		gas += 20000
 	}
 
-	fmt.Println("past gas")
-	fmt.Println("Gas post gasometer: ", gas)
 	txf = txf.WithGas(gas)
 	//txf = txf.WithFees(c.fees)
-
-	fmt.Println("TXF after prepare factory and before WithGasPrices: ", txf)
 
 	if c.gasPrices != "" {
 		txf = txf.WithGasPrices(c.gasPrices)
 	}
 
-	fmt.Println("TXF after prepare factory and before WithGasAdjustment: ", txf)
-
 	if c.gasAdjustment != 0 && c.gasAdjustment != defaultGasAdjustment {
 		txf = txf.WithGasAdjustment(c.gasAdjustment)
 	}
-
-	fmt.Println("TXF after prepare factory and before BuildUnsignedTx: ", txf)
 
 	txUnsigned, err := txf.BuildUnsignedTx(msgs...)
 	if err != nil {
@@ -375,7 +347,6 @@ func (c Client) CreateTx(goCtx context.Context, account account.Account, msgs ..
 // makeSureAccountHasTokens makes sure the address has a positive balance.
 // It requests funds from the faucet if the address has an empty balance.
 func (c *Client) makeSureAccountHasTokens(ctx context.Context, address string) error {
-	fmt.Println("Within makeSureAccountHasTokens")
 	if err := c.checkAccountBalance(ctx, address); err == nil {
 		return nil
 	} else {
@@ -394,8 +365,6 @@ func (c *Client) makeSureAccountHasTokens(ctx context.Context, address string) e
 }
 
 func (c *Client) checkAccountBalance(ctx context.Context, address string) error {
-	fmt.Println("Within checkAccountBalance")
-	fmt.Println("address: ", address)
 	resp, err := c.bankQueryClient.Balance(ctx, &banktypes.QueryBalanceRequest{
 		Address: address,
 		Denom:   "uakt",
@@ -403,8 +372,6 @@ func (c *Client) checkAccountBalance(ctx context.Context, address string) error 
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Response from c.bankQueryClient.Balance: ", resp)
 
 	if resp.Balance.Amount.Uint64() >= c.faucetMinAmount {
 		return nil
@@ -429,18 +396,13 @@ func handleBroadcastResult(resp *sdktypes.TxResponse, err error) error {
 }
 
 func (c *Client) prepareFactory(clientCtx client.Context) (tx.Factory, error) {
-	fmt.Println("Within prepareFactory")
-	fmt.Println("Within prepareFactory - clientCtx: ", clientCtx)
 
 	var (
 		from = clientCtx.GetFromAddress()
 		txf  = c.TxFactory
 	)
 
-	fmt.Println("from: ", from)
-
 	if err := c.accountRetriever.EnsureExists(clientCtx, from); err != nil {
-		fmt.Println("Error from c.accountRetriever.EnsureExist: ", err)
 		return txf, errors.WithStack(err)
 	}
 

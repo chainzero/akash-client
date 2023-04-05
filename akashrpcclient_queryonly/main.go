@@ -19,9 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fmt.Printf("%+v", client)
-	// fmt.Println("RPC: ", client.RPC)
-
 	// Instantiate a query client
 	queryClient := types.NewQueryClient(client.Context())
 
