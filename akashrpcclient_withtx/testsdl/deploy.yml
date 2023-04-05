@@ -1,0 +1,41 @@
+---
+version: "2.0"
+
+endpoints:
+ superippersist:
+   kind: ip
+
+services:
+  supermario:
+    image: pengbai/docker-supermario
+    expose:
+      - port: 8080
+        as: 80
+        to:
+          - global: true
+            ip: "superippersist"
+
+profiles:
+  compute:
+    supermario:
+      resources:
+        cpu:
+          units: 1.0
+        memory:
+          size: 256Mi
+        storage:
+          size: 256Mi
+  placement:
+    akash:
+      attributes:
+        iplease: true
+      pricing:
+        supermario:
+          denom: uakt
+          amount: 100000
+
+deployment:
+  supermario:
+    akash:
+      profile: supermario
+      count: 1
