@@ -104,14 +104,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Account: ", account)
-
-	addr, err := account.Address(addressPrefix)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("address: ", addr)
+	// addr, err := account.Address(addressPrefix)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// Broadcast a transaction from account with the message
 	// to create a post store response in txResp
