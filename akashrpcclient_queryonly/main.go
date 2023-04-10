@@ -22,17 +22,17 @@ func main() {
 	// Instantiate a query client
 	queryClient := types.NewQueryClient(client.Context())
 
-	// // Query the blockchain using the client's `Deployments` method
+	// // Query the blockchain using the client's `Deployments` method for a return of all deployments
 	// queryResp, err := queryClient.Deployments(ctx, &types.QueryDeploymentsRequest{})
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
 
-	// type DeploymentID struct {
-	// 	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner" yaml:"owner"`
-	// 	DSeq  uint64 `protobuf:"varint,2,opt,name=dseq,proto3" json:"dseq" yaml:"dseq"`
-	// }
+	// // Print response from querying all deployments on the blockchain
+	// fmt.Print("\n\nAll Akash deployments on the blockchain:\n\n")
+	// fmt.Println(queryResp)
 
+	// Query the blockchain using the client's `Deployment` method for a return of a specific deployment
 	deploymentid := types.DeploymentID{
 		Owner: "akash1f53fp8kk470f7k26yr5gztd9npzpczqv4ufud7",
 		DSeq:  10219997,
@@ -48,8 +48,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Print response from querying all the posts
-	fmt.Print("\n\nAll posts:\n\n")
+	// Print response from querying a specific deployment on the blockchain
+	fmt.Print("\n\nSpeciifc Akash deployment on the blockchain :\n\n")
 	fmt.Println(queryResp)
 
 }
