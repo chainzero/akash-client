@@ -50,6 +50,8 @@ func main() {
 		fmt.Println("Error: ", err)
 	}
 
+	fmt.Println("ID: ", id)
+
 	version, err := sdl.Version(sdlManifest)
 	if err != nil {
 		fmt.Println("Error from Version: ", err)
@@ -80,14 +82,15 @@ func main() {
 	}
 
 	if err := msg.ValidateBasic(); err != nil {
-		fmt.Println("Error from ValidateBasic: ", err)
+		fmt.Println("msg from basic validate: ", msg)
 	}
 
 	///////TX OPERATIONS/////////
 
 	// Account `chainzero` was available in local OS keychain from test machine
-	accountName := "chainzero"
-	// accountAddress := "akash1w3k6qpr4uz44py4z68chfrl7ltpxwtkngnc6xk"
+	// Update variables with your own key name and address
+	// accountName := "chainzero"
+	accountAddress := "akash1w3k6qpr4uz44py4z68chfrl7ltpxwtkngnc6xk"
 
 	ctx := context.Background()
 	addressPrefix := "akash"
@@ -98,8 +101,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Get account from the keyring
-	account, err := client.Account(accountName)
+	// Get account from the keyring via argument of either accountName or accountAddress
+	account, err := client.Account(accountAddress)
 	if err != nil {
 		log.Fatal(err)
 	}

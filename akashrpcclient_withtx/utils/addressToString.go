@@ -4,7 +4,6 @@
 package utils
 
 import (
-	"fmt"
 	"unsafe"
 
 	"github.com/cosmos/cosmos-sdk/types"
@@ -20,8 +19,6 @@ func String(aa types.AccAddress) string {
 	}
 
 	key := UnsafeBytesToStr(aa)
-
-	fmt.Println("Key within String: ", key)
 
 	return cacheBech32Addr("akash", aa, accAddrCache, key)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 
 	// "github.com/cosmos/cosmos-sdk/codec"
 	dkeyring "github.com/99designs/keyring"
@@ -69,11 +70,7 @@ func New(options ...Option) (Registry, error) {
 	inBuf := bufio.NewReader(os.Stdin)
 	interfaceRegistry := types.NewInterfaceRegistry()
 	cryptocodec.RegisterInterfaces(interfaceRegistry)
-	// cdc := codec.NewProtoCodec(interfaceRegistry)
-	// r.Keyring, err = keyring.New(r.keyringServiceName, string(r.keyringBackend), r.homePath, inBuf, cdc)
 	r.Keyring, err = keyring.New(r.keyringServiceName, string(r.keyringBackend), r.homePath, inBuf)
-
-	fmt.Println("Wihtin account new - registry: ", r)
 
 	if err != nil {
 		return Registry{}, err
@@ -138,7 +135,15 @@ func (r Registry) GetByAddress(address string) (Account, error) {
 	if err != nil {
 		return Account{}, err
 	}
+
 	info, err := r.Keyring.KeyByAddress(sdkAddr)
+
+	// Access the `name` field of the struct returned by the KeyByAddress function.
+	// The fields in this Cosmos SDK struct are not exported and thus must use reflect to access
+	v := reflect.ValueOf(info)
+	s := v.FieldByName("Name")
+	strName := fmt.Sprintf("%v", s.Interface())
+
 	if errors.Is(err, dkeyring.ErrKeyNotFound) || errors.Is(err, sdkerrors.ErrKeyNotFound) {
 		return Account{}, &AccountDoesNotExistError{address}
 	}
@@ -146,7 +151,7 @@ func (r Registry) GetByAddress(address string) (Account, error) {
 		return Account{}, err
 	}
 	return Account{
-		Name: address,
+		Name: strName,
 		Info: info,
 	}, nil
 }

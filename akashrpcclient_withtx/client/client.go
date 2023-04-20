@@ -252,7 +252,11 @@ func (c Client) Account(nameOrAddress string) (account.Account, error) {
 	if err == nil {
 		return acc, nil
 	}
-	return c.AccountRegistry.GetByAddress(nameOrAddress)
+	x, err := c.AccountRegistry.GetByAddress(nameOrAddress)
+	fmt.Println("GetByAddress result: ", x)
+	fmt.Println("GetByAddress error: ", err)
+
+	return x, err
 }
 
 func (c Client) lockBech32Prefix() (unlockFn func()) {
